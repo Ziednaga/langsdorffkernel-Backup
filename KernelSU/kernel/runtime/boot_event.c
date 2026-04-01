@@ -12,6 +12,7 @@
 
 bool ksu_module_mounted __read_mostly = false;
 bool ksu_boot_completed __read_mostly = false;
+extern bool ksu_input_hook __read_mostly;
 
 void on_post_fs_data(void)
 {
@@ -28,7 +29,7 @@ void on_post_fs_data(void)
     ksu_load_allow_list();
     ksu_observer_init();
     // Sanity check for safe mode only needs early-boot input samples.
-    ksu_stop_input_hook_runtime();
+    ksu_input_hook = false;
 }
 
 extern void ext4_unregister_sysfs(struct super_block *sb);
