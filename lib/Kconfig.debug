@@ -2509,7 +2509,4 @@ config HYPERV_TESTING
 	  Select this option to enable Hyper-V vmbus testing.
 
 endmenu # "Kernel Testing and Coverage"
-
-source "Documentation/Kconfig"
-
 endmenu # Kernel hacking
