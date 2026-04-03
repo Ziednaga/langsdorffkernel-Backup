@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 VERSION = 5
 PATCHLEVEL = 10
-SUBLEVEL = 225
+SUBLEVEL = 236
 EXTRAVERSION =
 NAME = Dare mighty things
 
@@ -17,22 +17,6 @@ $(if $(filter __%, $(MAKECMDGOALS)), \
 # That's our default target when none is given on the command line
 PHONY := __all
 __all:
-
-# Set variables while building with aosp build system
-ARCH := arm64
-CROSS_COMPILE := aarch64-linux-gnu-
-PLATFORM_VERSION ?= 13
-ANDROID_MAJOR_VERSION ?= t
-LLVM := 1
-LLVM_IAS := 1
-
-# Export them
-export ARCH
-export CROSS_COMPILE
-export PLATFORM_VERSION
-export ANDROID_MAJOR_VERSION
-export LLVM
-export LLVM_IAS
 
 # We are using a recursive build, so we need to do a little thinking
 # to get the ordering right.
@@ -561,8 +545,6 @@ export KBUILD_AFLAGS_MODULE KBUILD_CFLAGS_MODULE KBUILD_LDFLAGS_MODULE
 export KBUILD_AFLAGS_KERNEL KBUILD_CFLAGS_KERNEL
 export PAHOLE_FLAGS
 
-TARGET_SOC ?= s5e3830
-export TARGET_SOC
 # Files to ignore in find ... statements
 
 export RCS_FIND_IGNORE := \( -name SCCS -o -name BitKeeper -o -name .svn -o    \
@@ -1091,6 +1073,11 @@ endif
 # Align the bit size of userspace programs with the kernel
 KBUILD_USERCFLAGS  += $(filter -m32 -m64 --target=%, $(KBUILD_CFLAGS))
 KBUILD_USERLDFLAGS += $(filter -m32 -m64 --target=%, $(KBUILD_CFLAGS))
+
+# userspace programs are linked via the compiler, use the correct linker
+ifeq ($(CONFIG_CC_IS_CLANG)$(CONFIG_LD_IS_LLD),yy)
+KBUILD_USERLDFLAGS += $(call cc-option, --ld-path=$(LD))
+endif
 
 # make the checker run with the right architecture
 CHECKFLAGS += --arch=$(ARCH)

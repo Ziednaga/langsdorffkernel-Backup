@@ -229,12 +229,10 @@ static ssize_t sysfs_show_version_info(struct kobject *kobj,
 			"f/w_ver: %s\n"
 			"hcf_ver_hw: %s\n"
 			"hcf_ver_sw: %s\n"
-			"regDom_ver: %d.%d\n",
-			build_id_drv,
-			build_id_fw,
-			sdev->mib[0].platform,
-			sdev->mib[1].platform,
-			((sdev->reg_dom_version >> 8) & 0xFF), (sdev->reg_dom_version & 0xFF));
+			"regDom_ver: %d.%d.%d\n",
+			build_id_drv, build_id_fw, sdev->mib[0].platform, sdev->mib[1].platform,
+			(sdev->reg_dom_version >> 16) & 0xFF, (sdev->reg_dom_version >> 8) & 0xFF,
+			sdev->reg_dom_version & 0xFF);
 }
 
 /* Register sysfs version information */
@@ -583,19 +581,15 @@ static void write_wifi_version_info_file(struct slsi_dev *sdev)
 		 "f/w_ver: %s\n"
 		 "hcf_ver_hw: %s\n"
 		 "hcf_ver_sw: %s\n"
-		 "regDom_ver: %d.%d\n",
-		 build_id_drv,
-		 build_id_fw,
-		 sdev->mib[0].platform,
-		 sdev->mib[1].platform,
-		 ((sdev->reg_dom_version >> 8) & 0xFF), (sdev->reg_dom_version & 0xFF));
+		 "regDom_ver: %d.%d.%d\n",
+		 build_id_drv, build_id_fw, sdev->mib[0].platform, sdev->mib[1].platform,
+		 (sdev->reg_dom_version >> 16) & 0xFF, (sdev->reg_dom_version >> 8) & 0xFF,
+		 sdev->reg_dom_version & 0xFF);
 #else
 	/* O-OS, or unknown */
-	snprintf(buf, sizeof(buf),
-		 "%s (f/w_ver: %s)\nregDom_ver: %d.%d\n",
-		 build_id_drv,
-		 build_id_fw,
-		 ((sdev->reg_dom_version >> 8) & 0xFF), (sdev->reg_dom_version & 0xFF));
+	snprintf(buf, sizeof(buf), "%s (f/w_ver: %s)\nregDom_ver: %d.%d.%d\n", build_id_drv, build_id_fw,
+		 (sdev->reg_dom_version >> 16) & 0xFF, (sdev->reg_dom_version >> 8) & 0xFF,
+		 sdev->reg_dom_version & 0xFF);
 #endif
 
 /* If SCSC_SEP_VERSION is not known, avoid writing the file, as it could go to the wrong
@@ -2981,8 +2975,11 @@ void slsi_vif_deactivated(struct slsi_dev *sdev, struct net_device *dev)
 		memset(ndev_vif->sta.keepalive_host_tag, 0, sizeof(ndev_vif->sta.keepalive_host_tag));
 
 		/* delete the TSPEC entries (if any) if it is a STA vif */
-		if (ndev_vif->iftype == NL80211_IFTYPE_STATION)
+		if (ndev_vif->iftype == NL80211_IFTYPE_STATION){
+			SLSI_MUTEX_LOCK(sdev->tspec_mutex);
 			cac_delete_tspec_list(sdev);
+			SLSI_MUTEX_UNLOCK(sdev->tspec_mutex);
+		}
 
 		if (ndev_vif->sta.tdls_enabled)
 			WARN(ndev_vif->sta.tdls_peer_sta_records, "vif:%d, tdls_peer_sta_records:%d", ndev_vif->ifnum, ndev_vif->sta.tdls_peer_sta_records);

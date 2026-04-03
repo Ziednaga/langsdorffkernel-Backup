@@ -63,6 +63,8 @@ static const char *gc_mode_names[MAX_GC_MODE] = {
 const char *sec_fua_mode_names[NR_F2FS_SEC_FUA_MODE] = {
 	"NONE",
 	"ROOT",
+	"DIR",
+	"NODE",
 	"ALL",
 };
 
@@ -272,6 +274,13 @@ static ssize_t encoding_show(struct f2fs_attr *a,
 			sb->s_encoding->version & 0xff);
 #endif
 	return sprintf(buf, "(none)");
+}
+
+static ssize_t encoding_flags_show(struct f2fs_attr *a,
+		struct f2fs_sb_info *sbi, char *buf)
+{
+	return sysfs_emit(buf, "%x\n",
+		le16_to_cpu(F2FS_RAW_SUPER(sbi)->s_encoding_flags));
 }
 
 static ssize_t mounted_time_sec_show(struct f2fs_attr *a,
@@ -734,7 +743,7 @@ out:
 	}
 #ifdef CONFIG_F2FS_ML_BASED_STREAM_SEPARATION
 	if (!strcmp(a->attr.name, "streamid_attr")) {
-		char *streamid_buf;
+		char *streamid_buf, *streamid_buf_orig;
 		char *ptr;
 		long long streamid_attr[STREAMID_PARAMS];
 		long long lt;
@@ -744,17 +753,18 @@ out:
 		if (!streamid_buf)
 			return -ENOMEM;
 
+		streamid_buf_orig = streamid_buf;
 		while ((ptr = strsep(&streamid_buf, " ")) != NULL) {
 
 			ret = kstrtoll(skip_spaces(ptr), 10, &lt);
 			if (ret < 0 || i >= STREAMID_PARAMS) {
-				kvfree(streamid_buf);
+				kvfree(streamid_buf_orig);
 				return -EINVAL;
 			}
 			streamid_attr[i++] = lt;
 		}
 
-		kvfree(streamid_buf);
+		kvfree(streamid_buf_orig);
 
 		if (i != STREAMID_PARAMS)
 			return -EINVAL;
@@ -1228,6 +1238,7 @@ F2FS_GENERAL_RO_ATTR(features);
 F2FS_GENERAL_RO_ATTR(current_reserved_blocks);
 F2FS_GENERAL_RO_ATTR(unusable);
 F2FS_GENERAL_RO_ATTR(encoding);
+F2FS_GENERAL_RO_ATTR(encoding_flags);
 F2FS_GENERAL_RO_ATTR(mounted_time_sec);
 F2FS_GENERAL_RO_ATTR(main_blkaddr);
 F2FS_GENERAL_RO_ATTR(pending_discard);
@@ -1274,6 +1285,9 @@ F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, compr_saved_block, compr_saved_block);
 F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, compr_new_inode, compr_new_inode);
 #endif
 F2FS_FEATURE_RO_ATTR(pin_file);
+#ifdef CONFIG_UNICODE
+F2FS_FEATURE_RO_ATTR(linear_lookup);
+#endif
 
 #ifdef CONFIG_F2FS_SEC_SUPPORT_DNODE_RELOCATION
 F2FS_FEATURE_RO_ATTR(sec_dnode_relocation);
@@ -1377,6 +1391,7 @@ static struct attribute *f2fs_attrs[] = {
 	ATTR_LIST(reserved_blocks),
 	ATTR_LIST(current_reserved_blocks),
 	ATTR_LIST(encoding),
+	ATTR_LIST(encoding_flags),
 	ATTR_LIST(mounted_time_sec),
 #ifdef CONFIG_F2FS_STAT_FS
 	ATTR_LIST(cp_foreground_calls),
@@ -1437,6 +1452,9 @@ static struct attribute *f2fs_feat_attrs[] = {
 	ATTR_LIST(compression),
 #endif
 	ATTR_LIST(pin_file),
+#ifdef CONFIG_UNICODE
+	ATTR_LIST(linear_lookup),
+#endif
 #ifdef CONFIG_F2FS_SEC_SUPPORT_DNODE_RELOCATION
 	ATTR_LIST(sec_dnode_relocation),
 #endif

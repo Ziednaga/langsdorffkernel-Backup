@@ -470,7 +470,7 @@ int is_hw_get_address(void *itfc_data, void *pdev_data, int hw_id)
 		itf_hwip->hw_ip->dump_region[REG_SETA][idx].start = 0x9FB8;
 		itf_hwip->hw_ip->dump_region[REG_SETA][idx++].end = 0xFFFF;
 
-		info_itfc("[ID:%2d] 3AA VA(0x%lx)\n", hw_id, (ulong)itf_hwip->hw_ip->regs[REG_SETA]);
+		info_itfc("[ID:%2d] 3AA VA(0x%pK)\n", hw_id, (ulong)itf_hwip->hw_ip->regs[REG_SETA]);
 		break;
 	case DEV_HW_3AA1:
 		mem_res = platform_get_resource(pdev, IORESOURCE_MEM, IORESOURCE_3AA1);
@@ -495,7 +495,7 @@ int is_hw_get_address(void *itfc_data, void *pdev_data, int hw_id)
 		itf_hwip->hw_ip->dump_region[REG_SETA][idx].start = 0x9FB8;
 		itf_hwip->hw_ip->dump_region[REG_SETA][idx++].end = 0xFFFF;
 
-		info_itfc("[ID:%2d] 3AA VA(0x%lx)\n", hw_id, (ulong)itf_hwip->hw_ip->regs[REG_SETA]);
+		info_itfc("[ID:%2d] 3AA VA(0x%pK)\n", hw_id, (ulong)itf_hwip->hw_ip->regs[REG_SETA]);
 		break;
 	case DEV_HW_ISP0:
 		mem_res = platform_get_resource(pdev, IORESOURCE_MEM, IORESOURCE_ITP0);
@@ -512,7 +512,7 @@ int is_hw_get_address(void *itfc_data, void *pdev_data, int hw_id)
 			return -EINVAL;
 		}
 
-		info_itfc("[ID:%2d] ITP0 VA(0x%lx)\n", hw_id, (ulong)itf_hwip->hw_ip->regs[REG_SETA]);
+		info_itfc("[ID:%2d] ITP0 VA(0x%pK)\n", hw_id, (ulong)itf_hwip->hw_ip->regs[REG_SETA]);
 		break;
 	case DEV_HW_MCSC0:
 		mem_res = platform_get_resource(pdev, IORESOURCE_MEM, IORESOURCE_MCSC);
@@ -529,7 +529,7 @@ int is_hw_get_address(void *itfc_data, void *pdev_data, int hw_id)
 			return -EINVAL;
 		}
 
-		info_itfc("[ID:%2d] MCSC0 VA(0x%lx)\n", hw_id, (ulong)itf_hwip->hw_ip->regs[REG_SETA]);
+		info_itfc("[ID:%2d] MCSC0 VA(0x%pK)\n", hw_id, (ulong)itf_hwip->hw_ip->regs[REG_SETA]);
 		break;
 	case DEV_HW_VRA:
 		mem_res = platform_get_resource(pdev, IORESOURCE_MEM, IORESOURCE_VRA0);
@@ -546,7 +546,7 @@ int is_hw_get_address(void *itfc_data, void *pdev_data, int hw_id)
 			return -EINVAL;
 		}
 
-		info_itfc("[ID:%2d] VRA0 VA(0x%lx)\n", hw_id, (ulong)itf_hwip->hw_ip->regs[REG_SETA]);
+		info_itfc("[ID:%2d] VRA0 VA(0x%pK)\n", hw_id, (ulong)itf_hwip->hw_ip->regs[REG_SETA]);
 		break;
 	case DEV_HW_MCSC1:
 		mem_res = platform_get_resource(pdev, IORESOURCE_MEM, IORESOURCE_MCSC_MFC);
@@ -563,7 +563,7 @@ int is_hw_get_address(void *itfc_data, void *pdev_data, int hw_id)
 			return -EINVAL;
 		}
 
-		info_itfc("[ID:%2d] MCSC1 VA(0x%lx)\n", hw_id, (ulong)itf_hwip->hw_ip->regs[REG_SETA]);
+		info_itfc("[ID:%2d] MCSC1 VA(0x%pK)\n", hw_id, (ulong)itf_hwip->hw_ip->regs[REG_SETA]);
 		break;
 	default:
 		probe_err("hw_id(%d) is invalid", hw_id);
