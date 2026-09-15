@@ -58,6 +58,14 @@ void margin_table_init(void)
 	init_margin_table[MARGIN_DISP] = margin_disp;
 	init_margin_table[MARGIN_AUD] = margin_aud;
 	init_margin_table[MARGIN_CP] = margin_cp;
+
+	/*
+	 * fvmap_copy_from_sram() applies these at boot, but the sysfs show
+	 * handlers read percent_margin_table, which stayed zero. Mirror the
+	 * boot values so the nodes report the margin actually in effect.
+	 */
+	memcpy(percent_margin_table, init_margin_table,
+	       sizeof(percent_margin_table));
 }
 
 int fvmap_set_raw_voltage_table(unsigned int id, int uV)
