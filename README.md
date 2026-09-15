@@ -17,6 +17,7 @@
 - Removed firmware checks from check_connection in novatek touchscreen driver to fix 2 seconds delay for RestlessOS treble patchset based GSI's
 - Built-in hook for the `${fps_position}` bug in flagship FOD ports.
 - Updated `sdfat` driver to v2.8.1 (from a33x).
+- Support for LXC-type containers (Droidspaces)(Make sure to disable `Unmount for ALL/Non-su process`in SUSFS settings).
 - AVB and some security checks disabled.
 - Based on Linux 5.10.236.
 
